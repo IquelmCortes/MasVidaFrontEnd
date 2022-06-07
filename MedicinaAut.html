@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script type="module">
+        import { alertController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.alertController = alertController;
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Medicina autorizada</title>
+</head>
+<style>
+    ion-col {
+        border: solid 2px rgb(0, 0, 0);
+    }
+</style>
+
+<body>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar>
+                <ion-title id="titulo"></ion-title>
+                <ion-button slot="end" fill="clear" onclick="Volver()">
+                    <ion-icon color="dark" name="arrow-back-circle" slot="end"></ion-icon>
+                </ion-button>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <center>
+                <div style="margin-top: 30px;">Usted tiene los siguientes medicamentos autorizados: </div><br><br>
+                <ion-grid>
+                    <ion-row>
+                        <ion-col style="background-color: rgb(81, 196, 241);">Nombre</ion-col>
+                        <ion-col style="background-color: rgb(81, 196, 241);">Cantidad</ion-col>
+                        <ion-col style="background-color: rgb(81, 196, 241);">Dosis</ion-col>
+                    </ion-row>
+                    <ion-row id="fila"></ion-row>
+                </ion-grid>
+            </center>
+        </ion-content>
+    </ion-app>
+</body>
+<script>
+    function Volver() {
+        window.location.href = 'IngresoPaciente.html';
+    }
+
+    let paciente = document.getElementById("titulo");
+    const mostrarUsuario = () => {
+        const user = JSON.parse(sessionStorage.getItem('paciente'));
+        console.log(user);
+        if (user == null) {
+            alert("Necesita iniciar sesión");
+            setTimeout(() => {
+                window.location = '../inicio.html';
+            }, 500);
+        }
+        const nombre = user.name + ' ' + user.lastName;
+        paciente.append(nombre);
+        for (i = 0; i < user.med.length; i++) {
+            $("#fila").append("<ion-col size='4'>" + user.med[i].name + "</ion-col>")
+            $("#fila").append("<ion-col size='4'>" + user.med[i].quantity + "</ion-col>")
+            $("#fila").append("<ion-col size='4'>" + user.med[i].dosis +"</ion-col>")
+        }
+    }
+
+    $(document).ready(function () {
+        mostrarUsuario();
+    })
+</script>
+
+</html>

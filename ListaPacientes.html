@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script type="module">
+        import { alertController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.alertController = alertController;
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Informacion del paciente</title>
+</head>
+<body>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar>
+                <ion-title id="titulo"></ion-title>
+                <ion-button slot="end" fill="clear" onclick="Volver()">
+                    <ion-icon color="dark" name="arrow-back-circle" slot="end"></ion-icon>
+                </ion-button>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <center>
+                <div style="margin-top: 30px;">La siguiente es la informacion que tenemos del paciente: </div><br><br>
+                <ion-grid id="grid" style="margin-left: 60px;"></ion-grid>
+            </center>
+        </ion-content>
+    </ion-app>
+</body>
+<script>
+        function Volver() {
+        window.location.href = 'ReportePacientes.html';
+    }
+
+    let paciente = document.getElementById("titulo");
+    const mostrarUsuario = () => {
+        const user = JSON.parse(sessionStorage.getItem('Informacion'));
+        $.ajax({
+            url: 'http://localhost/api/Paciente/Code/' + user,
+            type: 'GET',
+            dataType: 'json',
+            success: function (json) {
+                $("#grid").empty();
+                paciente.append(json.name + ' ' + json.lastName);
+                $("#grid").append("<ion-row><div>" + 'Teléfono: ' + json.phone + "</ion-row></div><br><br>");
+                $("#grid").append("<ion-row><div>" + 'Dirección: ' + json.address + "</ion-row></div><br><br>");
+                $("#grid").append("<ion-row><div>" + 'Ciudad: ' + json.population + "</ion-row></div><br><br>");
+                $("#grid").append("<ion-row><div>" + 'Departamento: ' + json.stateC + "</ion-row></div><br><br>");
+                $("#grid").append("<ion-row><div>" + 'Ciudad: ' + json.population + "</ion-row></div><br><br>");
+                for (i = 0; i < json.ch.length; i++) {
+                    $("#grid").append("<ion-row><div>" + 'Chequeos autorizados: ' + json.ch[i].area + ' el día ' + json.ch[i].medicalDate + "</ion-row></div><br><br>");
+                }
+                for (i = 0; i < json.med.length; i++) {
+                    $("#grid").append("<ion-row><div>" + 'Medicamentos autorizados: ' + json.med[i].name + ' con una dosis de ' + json.med[i].dosis + "</ion-row></div><br><br>");
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        mostrarUsuario();
+    })
+</script>
+</script>
+</html>

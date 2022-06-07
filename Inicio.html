@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script type="module">
+        import { alertController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.alertController = alertController;
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Más vida</title>
+</head>
+
+<body>
+    <ion-app color="dark">
+        <ion-content>
+            <ion-grid>
+                <ion-row>
+                    <ion-col size-md="4" offset-md="4" style="margin-top: 100px;">
+                        <ion-card color="light">
+                            <ion-card-header>
+                                <center>
+                                    <ion-card-title style="font-size: 50px; font-family:Brush Script MT;">
+                                        Clínica más vida
+                                    </ion-card-title><br><br>
+                                    <ion-icon name="medkit-outline" style="width: 100px; height:100px"></ion-icon>
+                                    <ion-item>
+                                        <ion-label>Tipo de usuario</ion-label>
+                                        <ion-select class="custom-options" id="options" ok-text="Confirmar"
+                                            cancel-text="Cancelar">
+                                            <ion-select-option>Médico</ion-select-option>
+                                            <ion-select-option>Paciente</ion-select-option>
+                                        </ion-select>
+                                    </ion-item><br>
+                                    <ion-item color="dark">
+                                        <ion-label>Nombre</ion-label>
+                                        <ion-input id="name" type="text" placeholder="Nombre" );>
+                                        </ion-input>
+                                    </ion-item><br>
+                                    <ion-item color="dark">
+                                        <ion-label>Código</ion-label><br>
+                                        <ion-input id="code" type="number" placeholder="Código">
+                                        </ion-input>
+                                    </ion-item>
+                                </center>
+                            </ion-card-header>
+                            <section>
+                                <center>
+                                    <ion-button id="ingreso">Ingresar</ion-button>
+                                </center>
+                            </section><br>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-content>
+    </ion-app>
+</body>
+<script>
+    const button = document.getElementById("ingreso");
+    button.addEventListener('click', handleButtonClick);
+
+    async function handleButtonClick() {
+        if ($("#options").val() == "") {
+            const alert = await alertController.create({
+                header: 'Error',
+                message: 'Por favor ingrese un usuario',
+                buttons: ['Ok'],
+            });
+            await alert.present();
+        } else if ($("#name").val() == "" || $("#code").val() == "") {
+            const alert = await alertController.create({
+                header: 'Error',
+                message: 'Es necesario llenar los campos',
+                buttons: ['Ok'],
+            })
+            await alert.present();
+        }
+        else {
+            if ($("#options").val() == "Médico") {
+                $.ajax({
+                    url: 'http://localhost/api/Medico/all',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (json) {
+                        console.log(json);
+                        for(var i = 0; i < json.length; i++){
+                            if ($("#name").val() == json[i].name && $("#code").val() == json[i].id) {
+                                const medico = JSON.stringify(json[i]);
+                                sessionStorage.setItem("medico", medico);
+                            window.location.href = "IngresoMedico.html";
+                        }
+                        } 
+                    }
+                });
+            }else if ($("#options").val() == "Paciente") {
+                $.ajax({
+                    url: 'http://localhost/api/Paciente/all',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (json) {
+                        console.log(json);
+                        for(var i = 0; i < json.length; i++){
+                            if ($("#name").val() == json[i].name && $("#code").val() == json[i].id) {
+                                const paciente = JSON.stringify(json[i]);
+                                sessionStorage.setItem("paciente", paciente);
+                            window.location.href = "IngresoPaciente.html";
+                        }
+                        } 
+                    }
+                });
+            }
+        }
+    }
+</script>
+
+</html>

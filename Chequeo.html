@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script type="module">
+        import { alertController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.alertController = alertController;
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Autorizar chequeos</title>
+</head>
+<body>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar>
+                <ion-title id="titulo"></ion-title>
+                <ion-button slot="end" fill="clear" onclick="Volver()">
+                    <ion-icon color="dark" name="arrow-back-circle" slot="end"></ion-icon>
+                </ion-button>
+            </ion-toolbar>
+        </ion-header>
+        <ion-grid>
+            <ion-row>
+                <ion-col>
+                    <ion-card color="light">
+                        <ion-card-header>
+                            <center>
+                                <ion-item color="dark">
+                                    <ion-label>Fecha</ion-label>
+                                    <ion-input id="fecha" type="date" placeholder="Fecha asignada" );>
+                                    </ion-input>
+                                </ion-item><br>
+                                <ion-item color="dark">
+                                    <ion-label>Área</ion-label><br>
+                                    <ion-input id="area" type="text" placeholder="Area encargada">
+                                    </ion-input>
+                                </ion-item><br>
+                            </center>
+                        </ion-card-header>
+                        <section>
+                            <center>
+                                <ion-button id="autorizar">Autorizar</ion-button>
+                            </center>
+                        </section><br>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ion-app>
+</body>
+<script>
+    function Volver() {
+        window.location.href = 'AutorizarChequeos.html';
+    }
+
+    let paciente = document.getElementById("titulo");
+    const mostrarUsuario = () => {
+        const user = JSON.parse(sessionStorage.getItem('Informacion'));
+        $.ajax({
+            url: 'http://localhost/api/Paciente/Code/' + user,
+            type: 'GET',
+            dataType: 'json',
+            success: function (json) {
+                paciente.append(json.name + ' ' + json.lastName);
+            }
+        });
+    }
+    const button = document.getElementById("autorizar");
+    button.addEventListener('click', handleButtonClick);
+    async function handleButtonClick() {
+        if($("#fecha").val() == "" || $("#area").val() == ""){
+            const alert = await alertController.create({
+                header: 'Error',
+                message: 'Por favor ingrese todos los datos',
+                buttons: ['Ok'],
+            });
+            await alert.present();
+            $("#fecha").val(""); $("#area").val("");
+        }else{
+            const user = JSON.parse(sessionStorage.getItem('Informacion'));
+        $.ajax({
+            url: 'http://localhost/api/Paciente/Code/' + user,
+            type: 'GET',
+            dataType: 'json',
+            success: function (json) {
+                let chequeo = {
+            medicalDate: $("#fecha").val(),
+            area: $("#area").val(),
+            medico: { id: json.medico.id },
+            paciente: { id: json.id },
+        }
+        $.ajax({
+            url: 'http://localhost/api/Chequeos/save',
+            type: 'POST',
+            dataType: 'json',
+            contentType: "application/json",
+            data: JSON.stringify(chequeo),
+            complete: function (xhr, status) {
+                $("#fecha").val(""); $("#area").val("");
+            }
+        });
+            }
+        });
+        }
+    }
+    $(document).ready(function () {
+        mostrarUsuario();
+    })
+</script>
+</html>

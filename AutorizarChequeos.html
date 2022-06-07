@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script type="module">
+        import { modalController } from 'https://cdn.jsdelivr.net/npm/@ionic/core@latest/dist/ionic/index.esm.js';
+        window.modalController = modalController;
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Prescribir medicamentos</title>
+    <title>Autorizar chequeos</title>
+</head>
+
+<body>
+    <ion-app>
+        <div class="ion-page">
+            <center>
+                <ion-toolbar style="margin-top: 80px;">
+                    <ion-tittle style="font-size: 50px; font-family:Brush Script MT;">
+                        Clínica más vida
+                    </ion-tittle>
+                    <ion-button slot="end" fill="clear" onclick="Volver()">
+                        <ion-icon color="dark" name="arrow-back-circle" slot="end" style="width: 28px; height:28px;">
+                        </ion-icon>
+                    </ion-button>
+                </ion-toolbar>
+                <ion-toolbar>
+                    <ion-searchbar placeholder="Codigo de paciente" id="search"></ion-searchbar>
+                </ion-toolbar>
+                <ion-content fullscreen>
+                    <ion-list id="lista"></ion-list>
+                </ion-content>
+            </center>
+        </div>
+    </ion-app>
+</body>
+<script>
+    function Volver() {
+        window.location.href = 'IngresoMedico.html';
+    }
+
+    const searchbar = document.querySelector('ion-searchbar');
+    const items = Array.from(document.querySelector('ion-list').children);
+
+    searchbar.addEventListener('ionInput', handleInput);
+
+    function handleInput(event) {
+        Listar();
+        const query = event.target.value.toLowerCase();
+        requestAnimationFrame(() => {
+            items.forEach((item) => {
+                const shouldShow = item.textContent.toLowerCase().indexOf(query) > -1;
+                item.style.display = shouldShow ? 'block' : 'none';
+            });
+        });
+    }
+
+    function Listar() {
+        const user = JSON.parse(sessionStorage.getItem('medico'));
+        $("#lista").empty();
+        for (i = 0; i < user.paciente.length; i++) {
+            if (user.paciente[i].id == $("#search").val()) {
+                $("#lista").append("<ion-button fill='clear' expand='full' onclick='prescribir(" + user.paciente[i].id + ")'><ion-item>" + user.paciente[i].id + ' ' + user.paciente[i].name + ' ' + user.paciente[i].lastName + "</ion-item></ion-button");
+            }
+        }
+    }
+
+    function prescribir(id){
+        const paciente = JSON.stringify(id);
+        sessionStorage.setItem("Informacion", paciente);
+        window.location.href = 'Chequeo.html';
+    }
+
+    function asignar() {
+        var chequeo = {
+            medicalDate: $("#fecha").val(),
+            area: $("#area").val(),
+            medico: { id: $("#medico").val() },
+            paciente: { id: $("#paciente").val() },
+        }
+        $.ajax({
+            url: 'http://localhost/api/Chequeos/save',
+            type: 'POST',
+            dataType: 'json',
+            contentType: "application/json",
+            data: JSON.stringify(chequeo),
+            complete: function (xhr, status) {
+                alert("Usted está autorizando el siguiente chequeo " + $("#area").val() + " En la fecha " + $("#fecha").val());
+                $("#fecha").val(""); $("#area").val(""); $("#medico").val(""); $("#paciente").val("");
+            }
+        });
+    }
+</script>
+
+</html>

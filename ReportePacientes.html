@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Reporte de pacientes</title>
+</head>
+
+<body>
+    <ion-app>
+        <div class="ion-page">
+            <center>
+                <ion-toolbar style="margin-top: 80px;">
+                    <ion-tittle style="font-size: 50px; font-family:Brush Script MT;">
+                        Clínica más vida
+                    </ion-tittle>
+                    <ion-button slot="end" fill="clear" onclick="Volver()">
+                        <ion-icon color="dark" name="arrow-back-circle" slot="end" style="width: 28px; height:28px;">
+                        </ion-icon>
+                    </ion-button>
+                </ion-toolbar>
+                <ion-toolbar>
+                    <ion-searchbar placeholder="Nombre paciente" id="search"></ion-searchbar>
+                </ion-toolbar>
+                <ion-content fullscreen>
+                    <ion-list id="lista"></ion-list>
+                </ion-content>
+            </center>
+        </div>
+    </ion-app>
+</body>
+<script>
+    function Volver() {
+        window.location.href = 'IngresoMedico.html';
+    }
+
+    const mostrarUsuario = () => {
+        const user = JSON.parse(sessionStorage.getItem('medico'));
+        console.log(user);
+        if (user == null) {
+            alert("Necesita iniciar sesión");
+            setTimeout(() => {
+                window.location = '../Inicio.html';
+            }, 500);
+        }
+    }
+
+    const searchbar = document.querySelector('ion-searchbar');
+    const items = Array.from(document.querySelector('ion-list').children);
+
+    searchbar.addEventListener('ionInput', handleInput);
+
+    function handleInput(event) {
+        const query = event.target.value.toLowerCase();
+        requestAnimationFrame(() => {
+            items.forEach((item) => {
+                const shouldShow = item.textContent.toLowerCase().indexOf(query) > -1;
+                item.style.display = shouldShow ? 'block' : 'none';
+            });
+        });
+        Listar();
+    }
+
+    function Listar() {
+        const user = JSON.parse(sessionStorage.getItem('medico'));
+        $("#lista").empty();
+        for (i = 0; i < user.paciente.length; i++) {
+            if (user.paciente[i].name.toLowerCase().includes($("#search").val().toLowerCase())) {
+                $("#lista").append("<ion-button fill='clear' expand='full' onclick='InfoPaciente("+user.paciente[i].id+")'><ion-item>" + user.paciente[i].name + ' ' + user.paciente[i].lastName + "</ion-item></ion-button");
+            }
+        }
+    }
+
+    function InfoPaciente(id){
+        const paciente = JSON.stringify(id);
+        sessionStorage.setItem("Informacion", paciente);
+        window.location.href = 'ListaPacientes.html';
+    }
+
+    $(document).ready(function () {
+        mostrarUsuario();
+    })
+</script>
+
+</html>
